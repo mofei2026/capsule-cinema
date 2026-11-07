@@ -1,0 +1,10 @@
+version: 2
+tools:
+  LocalComfyMiniMaxH3VideoGeneratorTool:
+    module: custom_tools.video_generation.local_comfy_minimax_h3_adapter
+    category: video_generation
+    provider: local_comfyui
+    status: approved
+    runtime_engine: local-comfy-minimax-h3
+    cost_tier: local
+    requires_env: []

@@ -1,0 +1,24 @@
+--- a/rea_video/cli.py	2026-11-07 12:44:52.400609277 +0000
++++ b/rea_video/cli.py	2026-11-07 12:44:52.424609144 +0000
+@@ -178,11 +178,18 @@
+ 
+ 
+ def _capsule_python(explicit: str | None, capsule_root: Path) -> str:
+-    """capsule-cinema 的解释器：--python > $CAPSULE_CINEMA_PYTHON > <capsule-root>/.venv/bin/python > 当前解释器。"""
++    """capsule-cinema 的解释器：--python > $CAPSULE_CINEMA_PYTHON > 本机 venv > 当前解释器。
++
++    Windows 虚拟环境的解释器在 .venv/Scripts/python.exe，不在 .venv/bin/python。
++    """
+     if explicit or os.getenv("CAPSULE_CINEMA_PYTHON"):
+         return explicit or os.environ["CAPSULE_CINEMA_PYTHON"]
+-    venv = capsule_root.expanduser() / ".venv/bin/python"
+-    return str(venv) if venv.is_file() else sys.executable
++    root = capsule_root.expanduser()
++    for relative in (".venv/bin/python", ".venv/Scripts/python.exe"):
++        candidate = root / relative
++        if candidate.is_file():
++            return str(candidate)
++    return sys.executable
+ 
+ 
+ def _run_integration(script: str, python: str, argv: list[str]) -> int:
