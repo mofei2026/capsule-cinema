@@ -1,0 +1,37 @@
+version: 2
+capabilities_version: 1
+tools:
+  LocalComfyMiniMaxH3VideoGeneratorTool:
+    module: custom_tools.video_generation.local_comfy_minimax_h3_adapter
+    modality: video
+    provider: local_comfyui
+    status: approved
+    model: local MiniMax H3 FL2VA int8
+    description: 本机回环 ComfyUI 上的 MiniMax H3。显式 engine=local-comfy-minimax-h3 才会选中，不会调用付费 API，也不会在失败后改走云端。
+    best_for: [local_first_last_frame, local_image_to_video, local_text_to_video]
+    avoid_for: [paid_cloud_api, remote_comfy, ace_step_music_service]
+    inputs:
+      prompt: {type: string, required: true}
+      generation_type: {type: string, required: true}
+      output_path: {type: string, required: false}
+      start_image_path: {type: string, required: false}
+      end_image_path: {type: string, required: false}
+      aspect_ratio: {type: string, required: false}
+      duration: {type: number, required: false}
+      profile: {type: string, required: false}
+    outputs: {video: local_file_path}
+    provides:
+      flags: {text_to_video: true, image_to_video: true, first_last_frame: true, native_audio: true}
+      limits:
+        aspect_ratios: ["9:16", "16:9", "1:1", "4:3", "3:4", "21:9"]
+    tags: [local, comfyui, minimax_h3]
+    strengths: [loopback_only, explicit_local_engine, fl2va_first_last_frame, mp4_download]
+    pitfalls:
+      - smoke profile uses a short low-resolution clip so the 4090 can finish a wiring check
+      - reference_to_video is a separate Ref2VA graph and is not used for first_last_frame
+      - VLM planning keys are not required
+    qa: [mp4 ftyp header, history success, no cloud class types]
+    fallback: none
+    requires_env: []
+    cost_tier: local
+    capability_source: local_comfyui_0_43_0_blueprint
